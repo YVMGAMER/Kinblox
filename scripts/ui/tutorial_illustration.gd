@@ -9,6 +9,12 @@ enum Page { MOVE, ROTATE, DROP, HOLD, LINES, CHAIN }
 const COLS := 6
 const ROWS := 8
 const T_CELLS: Array[Vector2i] = [Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1)]
+const CHAIN_FRAMES := [
+	["22....", "11....", "11....", "22.6..", "354335"],
+	["22....", "11....", "11....", "22.6.."],
+	["22....", "22.6.."],
+	["...6.."],
+]
 
 var page: Page = Page.MOVE
 var _t := 0.0
@@ -149,16 +155,10 @@ func _draw_lines(gt: GameTheme) -> void:
 
 
 func _draw_chain(gt: GameTheme) -> void:
-	var frames := [
-		["22....", "11....", "11....", "22.6..", "354335"],
-		["22....", "11....", "11....", "22.6.."],
-		["22....", "22.6.."],
-		["...6.."],
-	]
-	var f := int(_t / 0.9) % (frames.size() + 1)
-	if f >= frames.size():
-		f = frames.size() - 1
-	var rows: Array = frames[f]
+	var f := int(_t / 0.9) % (CHAIN_FRAMES.size() + 1)
+	if f >= CHAIN_FRAMES.size():
+		f = CHAIN_FRAMES.size() - 1
+	var rows: Array = CHAIN_FRAMES[f]
 	match f:
 		0:
 			_rows(gt, rows, ROWS - 1, fmod(_t / 0.9, 1.0))

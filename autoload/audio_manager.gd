@@ -68,6 +68,15 @@ func _ready() -> void:
 	Settings.changed.connect(_on_setting_changed)
 
 
+## Release streams before shutdown so nothing is left playing at exit.
+func _exit_tree() -> void:
+	for p: AudioStreamPlayer in [_music_a, _music_b] + _pool:
+		p.stop()
+		p.stream = null
+	_streams.clear()
+	CellPainter.clear_cache()
+
+
 func play(sfx: Sfx, pitch: float = 1.0, volume_db: float = 0.0) -> void:
 	var stream: AudioStream = _streams.get(sfx)
 	if stream == null:

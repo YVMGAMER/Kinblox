@@ -10,6 +10,10 @@ const BEVEL_RATIO := 0.08
 static var _boxes: Dictionary = {}  # int key -> StyleBoxFlat
 
 
+static func clear_cache() -> void:
+	_boxes.clear()
+
+
 static func cell_rect(origin: Vector2, cell: Vector2i, size: float) -> Rect2:
 	var gap := size * GAP_RATIO
 	return Rect2(origin + Vector2(cell) * size + Vector2(gap, gap) * 0.5, Vector2(size - gap, size - gap))

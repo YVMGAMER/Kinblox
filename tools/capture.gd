@@ -74,6 +74,7 @@ func _process(_delta: float) -> bool:
 		var out: String = _args.get("out", "user://capture.png")
 		img.save_png(out)
 		print("saved ", out, " ", img.get_size())
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://capture_save.json"))
 		return true
 	return false
 

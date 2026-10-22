@@ -34,6 +34,7 @@ func _process(_delta: float) -> bool:
 	if _ops.is_empty():
 		if _jobs.is_empty():
 			print("UI smoke: %d jobs, %d button presses, done" % [_jobs_run, _pressed])
+			DirAccess.remove_absolute(ProjectSettings.globalize_path("user://ui_smoke_save.json"))
 			return true
 		_start_job(_jobs.pop_front())
 	var op: Array = _ops.pop_front()

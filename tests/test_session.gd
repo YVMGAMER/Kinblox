@@ -113,6 +113,37 @@ func test_pause_during_line_clear_is_safe() -> void:
 	check_eq(s.state, GameSession.State.PLAYING, "back to play")
 
 
+## Backgrounding the app mid-chain pauses in the CHAIN state; nothing may
+## resolve while paused, and the chain finishes normally after resuming.
+func test_pause_during_chain_is_safe() -> void:
+	var s := KinTest.started_session(ModeConfig.classic(5, true), Tuning.new())
+	s.update(s.tuning.ready_delay + 0.01)
+	s.board.load_pattern(PackedStringArray([
+		"22........",
+		"11........",
+		"11........",
+		"22........",
+		"012345012.",
+	]))
+	KinTest.set_active(s, PieceDefs.Type.I, 1, Vector2i(7, Board.HEIGHT - 4))
+	s.hard_drop()
+	s.update(s.tuning.line_clear_delay + 0.01)
+	check_eq(s.state, GameSession.State.CHAIN, "in chain")
+	var cells_before := s.board.cell_count()
+	s.pause()
+	for i in 100:
+		s.update(0.1)
+	check_eq(s.state, GameSession.State.PAUSED, "stays paused")
+	check_eq(s.board.cell_count(), cells_before, "board untouched while paused")
+	s.resume()
+	check_eq(s.state, GameSession.State.CHAIN, "back in chain")
+	for i in 10:
+		s.update(s.tuning.chain_highlight_delay + 0.01)
+	check_eq(s.state, GameSession.State.PLAYING, "chain finished")
+	check_eq(s.scoring.best_chain, 3, "two steps resolved (x2 then x3)")
+	check(s.board.is_empty(0, Board.HEIGHT - 1), "kin cleared")
+
+
 func test_inputs_ignored_when_not_playing() -> void:
 	var s := GameSession.new(ModeConfig.classic(1, true), Tuning.new())
 	s.start()
