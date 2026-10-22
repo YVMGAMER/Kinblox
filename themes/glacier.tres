@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="GameTheme" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://themes/game_theme.gd" id="1_theme"]
+
+[resource]
+script = ExtResource("1_theme")
+id = "glacier"
+display_name = "Glacier"
+is_dark = true
+background = Color(0.043137, 0.090196, 0.141176, 1)
+surface = Color(0.070588, 0.137255, 0.227451, 1)
+surface_alt = Color(0.094118, 0.188235, 0.298039, 1)
+board_background = Color(0.054902, 0.113725, 0.184314, 1)
+well = Color(0.07451, 0.152941, 0.239216, 1)
+outline = Color(0.129412, 0.239216, 0.364706, 1)
+scrim = Color(0.02, 0.05, 0.09, 0.78)
+text_primary = Color(0.917647, 0.956863, 1, 1)
+text_secondary = Color(0.623529, 0.713725, 0.811765, 1)
+text_muted = Color(0.364706, 0.458824, 0.564706, 1)
+accent = Color(0.498039, 0.878431, 1, 1)
+accent_text = Color(0.043137, 0.090196, 0.141176, 1)
+positive = Color(0.435294, 0.890196, 0.713725, 1)
+danger = Color(1, 0.560784, 0.639216, 1)
+flash = Color(0.92549, 0.976471, 1, 1)
+piece_colors = PackedColorArray(0.498039, 0.878431, 1, 1, 0.964706, 0.905882, 0.631373, 1, 0.662745, 0.607843, 1, 1, 0.435294, 0.890196, 0.713725, 1, 1, 0.560784, 0.639216, 1, 0.356863, 0.607843, 1, 1, 1, 0.709804, 0.478431, 1, 0.866667, 0.921569, 0.968627, 1)
+pattern_color = Color(0.02, 0.06, 0.1, 0.5)
+ghost_alpha = 0.32

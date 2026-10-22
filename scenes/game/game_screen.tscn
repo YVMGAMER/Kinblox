@@ -1,0 +1,355 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/game_screen.gd" id="1_screen"]
+[ext_resource type="Script" path="res://scripts/fx/ambient_background.gd" id="2_ambient"]
+[ext_resource type="Script" path="res://scripts/ui/safe_area.gd" id="3_safe"]
+[ext_resource type="Texture2D" path="res://assets/icons/pause.svg" id="4_pause"]
+[ext_resource type="Script" path="res://scripts/ui/piece_preview_view.gd" id="5_preview"]
+[ext_resource type="Script" path="res://scripts/ui/board_view.gd" id="6_board"]
+[ext_resource type="Script" path="res://scripts/ui/ghost_view.gd" id="7_ghost"]
+[ext_resource type="Script" path="res://scripts/ui/piece_view.gd" id="8_piece"]
+[ext_resource type="Script" path="res://scripts/fx/particle_field.gd" id="9_particles"]
+[ext_resource type="Script" path="res://scripts/ui/control_pad.gd" id="10_pad"]
+[ext_resource type="Script" path="res://scripts/fx/popup_layer.gd" id="11_popups"]
+[ext_resource type="Script" path="res://scripts/fx/banner.gd" id="12_banner"]
+[ext_resource type="Script" path="res://scripts/ui/touch_input.gd" id="13_touch"]
+[ext_resource type="Script" path="res://scripts/ui/input_router.gd" id="14_router"]
+[ext_resource type="Script" path="res://scripts/fx/game_feedback.gd" id="15_feedback"]
+[ext_resource type="Script" path="res://scripts/fx/game_juice.gd" id="16_juice"]
+[ext_resource type="Script" path="res://scripts/fx/shaker.gd" id="17_shaker"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="18_hud"]
+[ext_resource type="PackedScene" path="res://scenes/game/pause_overlay.tscn" id="19_pause"]
+[ext_resource type="PackedScene" path="res://scenes/game/results_overlay.tscn" id="20_results"]
+
+[node name="GameScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_screen")
+
+[node name="Ambient" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_ambient")
+
+[node name="Layout" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_safe")
+
+[node name="Column" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="TopBar" type="HBoxContainer" parent="Layout/Column"]
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PauseButton" type="Button" parent="Layout/Column/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"IconButton"
+icon = ExtResource("4_pause")
+icon_alignment = 1
+expand_icon = true
+
+[node name="ScoreBox" type="VBoxContainer" parent="Layout/Column/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ScoreCaption" type="Label" parent="Layout/Column/TopBar/ScoreBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "SCORE"
+horizontal_alignment = 1
+
+[node name="ScoreValue" type="Label" parent="Layout/Column/TopBar/ScoreBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ScoreLabel"
+text = "0"
+horizontal_alignment = 1
+
+[node name="BestBox" type="VBoxContainer" parent="Layout/Column/TopBar"]
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="BestCaption" type="Label" parent="Layout/Column/TopBar/BestBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "BEST"
+horizontal_alignment = 2
+
+[node name="BestValue" type="Label" parent="Layout/Column/TopBar/BestBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+text = "0"
+horizontal_alignment = 2
+
+[node name="InfoRow" type="HBoxContainer" parent="Layout/Column"]
+custom_minimum_size = Vector2(0, 184)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="HoldPanel" type="PanelContainer" parent="Layout/Column/InfoRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(184, 184)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"InsetPanel"
+
+[node name="HoldBox" type="VBoxContainer" parent="Layout/Column/InfoRow/HoldPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="HoldCaption" type="Label" parent="Layout/Column/InfoRow/HoldPanel/HoldBox"]
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "HOLD"
+horizontal_alignment = 1
+
+[node name="HoldView" type="Control" parent="Layout/Column/InfoRow/HoldPanel/HoldBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("5_preview")
+source = 0
+
+[node name="StatsBox" type="VBoxContainer" parent="Layout/Column/InfoRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ModeLabel" type="Label" parent="Layout/Column/InfoRow/StatsBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "CLASSIC"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="StatsRow" type="HBoxContainer" parent="Layout/Column/InfoRow/StatsBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="LevelBox" type="VBoxContainer" parent="Layout/Column/InfoRow/StatsBox/StatsRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="LevelCaption" type="Label" parent="Layout/Column/InfoRow/StatsBox/StatsRow/LevelBox"]
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "LEVEL"
+horizontal_alignment = 1
+
+[node name="LevelValue" type="Label" parent="Layout/Column/InfoRow/StatsBox/StatsRow/LevelBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+text = "1"
+horizontal_alignment = 1
+
+[node name="LinesBox" type="VBoxContainer" parent="Layout/Column/InfoRow/StatsBox/StatsRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="LinesCaption" type="Label" parent="Layout/Column/InfoRow/StatsBox/StatsRow/LinesBox"]
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "LINES"
+horizontal_alignment = 1
+
+[node name="LinesValue" type="Label" parent="Layout/Column/InfoRow/StatsBox/StatsRow/LinesBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+text = "0"
+horizontal_alignment = 1
+
+[node name="CounterRow" type="HBoxContainer" parent="Layout/Column/InfoRow/StatsBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="ComboLabel" type="Label" parent="Layout/Column/InfoRow/StatsBox/CounterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"AccentLabel"
+horizontal_alignment = 1
+
+[node name="ChainLabel" type="Label" parent="Layout/Column/InfoRow/StatsBox/CounterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"AccentLabel"
+horizontal_alignment = 1
+
+[node name="NextPanel" type="PanelContainer" parent="Layout/Column/InfoRow"]
+custom_minimum_size = Vector2(360, 184)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"InsetPanel"
+
+[node name="NextBox" type="VBoxContainer" parent="Layout/Column/InfoRow/NextPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="NextCaption" type="Label" parent="Layout/Column/InfoRow/NextPanel/NextBox"]
+layout_mode = 2
+theme_type_variation = &"CaptionLabel"
+text = "NEXT"
+horizontal_alignment = 1
+
+[node name="NextView" type="Control" parent="Layout/Column/InfoRow/NextPanel/NextBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("5_preview")
+source = 1
+
+[node name="BoardArea" type="Control" parent="Layout/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="BoardView" type="Control" parent="Layout/Column/BoardArea"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 1280.0
+mouse_filter = 2
+script = ExtResource("6_board")
+
+[node name="Field" type="Control" parent="Layout/Column/BoardArea/BoardView"]
+unique_name_in_owner = true
+clip_contents = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Ghost" type="Control" parent="Layout/Column/BoardArea/BoardView/Field"]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("7_ghost")
+
+[node name="Piece" type="Control" parent="Layout/Column/BoardArea/BoardView/Field"]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("8_piece")
+
+[node name="Particles" type="Control" parent="Layout/Column/BoardArea/BoardView"]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("9_particles")
+
+[node name="ControlPad" type="Control" parent="Layout/Column"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 296)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("10_pad")
+
+[node name="FxLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Popups" type="Control" parent="FxLayer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("11_popups")
+
+[node name="Banner" type="VBoxContainer" parent="FxLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 640.0
+offset_bottom = 200.0
+mouse_filter = 2
+script = ExtResource("12_banner")
+
+[node name="TouchInput" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("13_touch")
+
+[node name="InputRouter" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("14_router")
+
+[node name="Feedback" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("15_feedback")
+
+[node name="Juice" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("16_juice")
+
+[node name="Shaker" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("17_shaker")
+
+[node name="Hud" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("18_hud")
+
+[node name="PauseOverlay" parent="." instance=ExtResource("19_pause")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="ResultsOverlay" parent="." instance=ExtResource("20_results")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
