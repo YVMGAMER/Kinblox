@@ -53,9 +53,11 @@ var _fingers_down := 0
 var _sample_pos := PackedVector2Array()
 var _sample_time := PackedFloat64Array()
 var _sample_head := 0
+## Tests set this to drive time by hand; negative means use the real clock.
+var fake_time := -1.0
 
 
-func _ready() -> void:
+func _init() -> void:
 	_sample_pos.resize(SAMPLES)
 	_sample_time.resize(SAMPLES)
 
@@ -80,6 +82,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _now() -> float:
+	if fake_time >= 0.0:
+		return fake_time
 	return Time.get_ticks_usec() / 1000000.0
 
 
@@ -91,7 +95,8 @@ func _on_touch(e: InputEventScreenTouch) -> void:
 			if _hit(hold_area, e.position):
 				hold_requested.emit()
 				return
-			if not gestures_enabled or not _hit(play_area, e.position) or _blocked(e.position):
+			var in_play := play_area == null or _hit(play_area, e.position)
+			if not gestures_enabled or not in_play or _blocked(e.position):
 				return
 			_primary = e.index
 			_start = e.position

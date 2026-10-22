@@ -26,6 +26,15 @@ func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
 		var parts := arg.trim_prefix("--").split("=", true, 1)
 		_args[parts[0]] = parts[1] if parts.size() > 1 else "true"
+
+
+## Runs on the first frame, after the autoloads' _ready (which would
+## otherwise overwrite these overrides).
+func _start() -> void:
+	# Never touch the real save: results and stats go to a throwaway file.
+	var store := root.get_node("SaveData").get("store") as SaveStore
+	store.path = "user://capture_save.json"
+	store.reset()
 	var settings := root.get_node("Settings")
 	var values: Dictionary = settings.get("_values")
 	if _args.has("buttons"):
@@ -44,6 +53,9 @@ func _initialize() -> void:
 
 func _process(_delta: float) -> bool:
 	_frame += 1
+	if _frame == 1:
+		_start()
+		return false
 	var wait := int(_args.get("frames", "30"))
 	var screen := _screen()
 	if _frame == 8 and _args.get("screen", "") == "game" and screen != null:

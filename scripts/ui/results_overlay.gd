@@ -48,6 +48,7 @@ func show_results(mode: ModeConfig, summary: Dictionary) -> void:
 	_again.text = "Practice again" if daily else "Play again"
 	_share_text = GameState.share_text(mode, summary)
 	_note.text = ""
+	_note.visible = false
 	open()
 
 
@@ -79,3 +80,4 @@ func _fill_stats(zen: bool, summary: Dictionary) -> void:
 func _on_share() -> void:
 	var result := ShareService.share(_share_text)
 	_note.text = "Shared" if result == ShareService.Result.SHARED else "Copied to clipboard"
+	_note.visible = true
