@@ -31,7 +31,9 @@ func bind(session: GameSession) -> void:
 	if session.mode.is_practice:
 		mode_label.text += " · NOT SCORED"
 	score_caption.text = "TIME" if _zen else "SCORE"
-	best_caption.text = "LINES BEST" if _zen else "BEST"
+	best_caption.text = "MOST LINES" if _zen else "BEST"
+	# Zen runs at one constant speed, so a level number would mean nothing.
+	level_value.get_parent().visible = not _zen
 	var store := SaveData.store
 	best_value.text = str(int((store.data["zen"] as Dictionary)["best_lines"])) if _zen else DailyCalendar.format_number(store.high_score(session.mode.record_key()))
 	_set_labels()

@@ -40,9 +40,10 @@ func bind(session: GameSession, router: InputRouter) -> void:
 	session.chain_highlight.connect(func(_g: Array[PackedInt32Array], step: int, _m: int) -> void:
 		AudioManager.play_semitones(AudioManager.Sfx.CHAIN, CHAIN_SCALE[mini(step - 1, CHAIN_SCALE.size() - 1)])
 		Haptics.pulse(Haptics.Kind.CHAIN, 1.0 + 0.15 * (step - 1)))
-	session.level_changed.connect(func(_l: int) -> void:
-		AudioManager.play(AudioManager.Sfx.LEVEL_UP)
-		Haptics.pulse(Haptics.Kind.LEVEL_UP))
+	if session.mode.fixed_gravity_interval <= 0.0:
+		session.level_changed.connect(func(_l: int) -> void:
+			AudioManager.play(AudioManager.Sfx.LEVEL_UP)
+			Haptics.pulse(Haptics.Kind.LEVEL_UP))
 	session.zen_sweep_started.connect(func(_r: int) -> void: AudioManager.play(AudioManager.Sfx.ZEN_SWEEP))
 	session.game_over.connect(func() -> void:
 		AudioManager.play(AudioManager.Sfx.GAME_OVER)

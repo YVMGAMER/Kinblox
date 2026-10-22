@@ -95,7 +95,8 @@ func _build_ui_theme(gt: GameTheme) -> Theme:
 	_button(t, &"GhostButton", Color(gt.surface_alt, 0.0), gt.text_secondary, font_semibold, gt)
 	_button(t, &"IconButton", Color(gt.surface_alt, 0.0), gt.text_primary, font_semibold, gt)
 	_button(t, &"ChipButton", gt.surface_alt, gt.text_secondary, font_semibold, gt)
-	for v: StringName in [&"PrimaryButton", &"GhostButton", &"IconButton", &"ChipButton"]:
+	_button(t, &"DangerButton", gt.danger, gt.accent_text, font_bold, gt)
+	for v: StringName in [&"PrimaryButton", &"GhostButton", &"IconButton", &"ChipButton", &"DangerButton"]:
 		t.set_type_variation(v, &"Button")
 	var chip_on := _box(gt.accent, UiTokens.RADIUS_MD, UiTokens.S4, UiTokens.S3)
 	t.set_stylebox(&"pressed", &"ChipButton", chip_on)

@@ -1,15 +1,18 @@
 class_name Overlay
 extends Control
-## Modal sheet over a dimmed scrim. Subclasses fill `%Sheet`.
+## Modal sheet over a dimmed scrim. Scenes provide a `%Sheet` node; code-built
+## subclasses assign `sheet` before _ready.
 
 signal closed
 
-@onready var sheet: Control = %Sheet
+var sheet: Control
 
 var _tween: Tween
 
 
 func _ready() -> void:
+	if sheet == null:
+		sheet = get_node("%Sheet") as Control
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	visible = false
 	ThemeManager.theme_changed.connect(func(_gt: GameTheme, _a: bool) -> void: queue_redraw())

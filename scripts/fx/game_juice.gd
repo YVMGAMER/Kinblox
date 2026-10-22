@@ -20,7 +20,9 @@ func bind(session: GameSession) -> void:
 	session.chain_highlight.connect(_on_chain_highlight)
 	session.chain_step_resolved.connect(_on_chain_resolved)
 	session.hard_dropped.connect(_on_hard_dropped)
-	session.level_changed.connect(func(level: int) -> void: banner.show_text("Level %d" % level, "Speed up"))
+	# Zen has one constant speed, so levels are not announced there.
+	if session.mode.fixed_gravity_interval <= 0.0:
+		session.level_changed.connect(func(level: int) -> void: banner.show_text("Level %d" % level, "Speed up"))
 	session.zen_sweep_started.connect(func(_r: int) -> void: banner.show_text("Fresh start", "The top is clear"))
 
 
