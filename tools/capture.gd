@@ -13,6 +13,7 @@ extends SceneTree
 ##   --buttons          use the on-screen button scheme (not saved)
 ##   --patterns         show colorblind patterns (not saved)
 ##   --pause / --results  open the pause or results overlay
+##   --page=<n>         How to play page index
 ##   --out=<file.png>
 ## Autoloads are looked up by node path: they are not compile-time globals
 ## in a -s script, and game scripts are only touched through duck typing.
@@ -60,6 +61,8 @@ func _process(_delta: float) -> bool:
 	var screen := _screen()
 	if _frame == 8 and _args.get("screen", "") == "game" and screen != null:
 		_run_bot(screen)
+	if _frame == 10 and _args.has("page") and screen != null and screen.has_method(&"_show"):
+		screen.call(&"_show", int(_args["page"]))
 	if _frame == wait - 6 and screen != null and screen.has_method(&"pause_game"):
 		if _args.has("pause"):
 			screen.call(&"pause_game")

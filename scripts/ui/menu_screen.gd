@@ -30,6 +30,8 @@ func _ready() -> void:
 		var scroll := ScrollContainer.new()
 		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		# Touch scrolling still works; a visible bar only crowds the cards on phones.
+		scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 		outer.add_child(scroll)
 		scroll.add_child(column)
 	else:

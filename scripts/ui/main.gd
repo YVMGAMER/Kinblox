@@ -92,8 +92,11 @@ func _back() -> void:
 
 
 func _on_theme_changed(_gt: GameTheme, animate: bool) -> void:
-	if animate and not Settings.reduce_motion():
-		var img := get_viewport().get_texture().get_image()
+	var img: Image = null
+	# The headless dummy renderer has no frame to snapshot.
+	if animate and not Settings.reduce_motion() and DisplayServer.get_name() != "headless":
+		img = get_viewport().get_texture().get_image()
+	if img != null and not img.is_empty():
 		_fade.texture = ImageTexture.create_from_image(img)
 		_fade.modulate.a = 1.0
 		_fade.visible = true

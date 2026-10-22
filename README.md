@@ -30,6 +30,17 @@ godot --headless --path . -s tests/run_all.gd
 ```
 
 The runner prints each test and exits with code 0 on success, 1 on failure.
+
+A UI smoke test opens every screen and presses every button (including the
+pause, results and confirmation sheets that buttons open), using a throwaway
+save file:
+
+```
+godot --headless --path . -s tests/ui_smoke.gd
+```
+
+It ends with `UI smoke: N jobs, M button presses, done`; any `SCRIPT ERROR`
+in its output is a failure.
 Suites live in `tests/test_*.gd` and cover collision, rotation and kicks for
 every piece, line clears, 7-bag fairness, chain resolution (multi-step),
 scoring, lock-delay reset cap, Daily seed determinism, sessions (hold, pause
