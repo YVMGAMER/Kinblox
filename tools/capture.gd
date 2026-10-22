@@ -101,6 +101,29 @@ func _run_bot(screen: Control) -> void:
 			break
 		_place_best(s)
 	s.tuning = shipped
+	if _args.get("demo", "") == "chain":
+		_chain_demo(s)
+
+
+## A board where one line clear sets off a two-step chain, played in real
+## time so the capture lands during the highlight.
+func _chain_demo(s: GameSession) -> void:
+	s.board.load_pattern(PackedStringArray([
+		"22........",
+		"11..66....",
+		"11..66..3.",
+		"22.....33.",
+		"012345014.",
+	]))
+	s.board_changed.emit()
+	# Offscreen frames are not throttled, so hold the highlight on screen.
+	s.tuning = s.tuning.duplicate() as Tuning
+	s.tuning.line_clear_delay = 0.05
+	s.tuning.chain_highlight_delay = 30.0
+	var p := Piece.new(PieceDefs.Type.I, 999, Vector2i(7, Board.HEIGHT - 6))
+	p.rot = 1
+	s.active = p
+	s.hard_drop()
 
 
 func _place_best(s: GameSession) -> void:

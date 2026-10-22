@@ -50,7 +50,8 @@ func load_from_disk() -> bool:
 	if not FileAccess.file_exists(path):
 		return true
 	var text := FileAccess.get_file_as_string(path)
-	var parsed: Variant = JSON.parse_string(text) if not text.is_empty() else null
+	var json := JSON.new()
+	var parsed: Variant = json.data if not text.is_empty() and json.parse(text) == OK else null
 	if not parsed is Dictionary:
 		_quarantine()
 		return false

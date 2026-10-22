@@ -12,6 +12,8 @@ var cell_size := 64.0
 var patterns := false
 
 var _gt: GameTheme
+var _frame_box: StyleBoxFlat
+var _ring_box: StyleBoxFlat
 var _flash_rows: Array[int] = []
 var _flash_t := 0.0
 var _flash_len := 0.3
@@ -28,11 +30,9 @@ var _sweep_len := 0.8
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_highlight.resize(Board.WIDTH * Board.HEIGHT)
-	_gt = ThemeManager.current
+	_set_theme(ThemeManager.current)
 	patterns = Settings.patterns_enabled()
-	ThemeManager.theme_changed.connect(func(gt: GameTheme, _a: bool) -> void:
-		_gt = gt
-		queue_redraw())
+	ThemeManager.theme_changed.connect(func(gt: GameTheme, _a: bool) -> void: _set_theme(gt))
 	Settings.changed.connect(func(key: StringName) -> void:
 		if key == &"patterns":
 			patterns = Settings.patterns_enabled()
@@ -56,7 +56,7 @@ func bind(p_session: GameSession) -> void:
 func set_cell_size(size_px: float) -> void:
 	cell_size = size_px
 	size = Vector2(Board.WIDTH, Board.VISIBLE_ROWS) * cell_size
-	queue_redraw()
+	_set_theme(_gt)
 
 
 ## Top-left of a board cell in local coordinates.
@@ -91,7 +91,7 @@ func _draw() -> void:
 	if _gt == null:
 		return
 	var frame := Rect2(Vector2(-FRAME_PAD, -FRAME_PAD), size + Vector2(FRAME_PAD, FRAME_PAD) * 2.0)
-	draw_style_box(_frame_box(), frame)
+	draw_style_box(_frame_box, frame)
 	var origin := Vector2(0, -Board.HIDDEN_ROWS * cell_size)
 	for y in range(Board.HIDDEN_ROWS, Board.HEIGHT):
 		for x in Board.WIDTH:
@@ -114,10 +114,16 @@ func _draw() -> void:
 				color = color.lerp(_gt.flash, 0.7 * (1.0 - k) + 0.3)
 			elif sweeping:
 				color.a *= 1.0 - clampf(_sweep_t / maxf(_sweep_len, 0.01), 0.0, 1.0)
-			elif _highlight_on and _highlight[Board.index(x, y)] == 1:
-				var pulse := 0.5 + 0.5 * sin(_highlight_t * 22.0)
-				color = color.lerp(_gt.flash, 0.25 + 0.35 * pulse)
-				rect = _scale_rect(rect, Vector2.ONE * (1.0 + 0.06 * pulse))
+			elif _highlight_on:
+				if _highlight[Board.index(x, y)] == 1:
+					var pulse := 0.5 + 0.5 * sin(_highlight_t * 22.0)
+					color = color.lerp(_gt.flash, 0.15 + 0.3 * pulse)
+					rect = _scale_rect(rect, Vector2.ONE * (1.0 + 0.06 * pulse))
+					CellPainter.draw_block(self, rect, color, slot, patterns, _gt)
+					draw_style_box(_ring_box, rect.grow(cell_size * 0.06))
+					continue
+				# Everything that is not kin steps back so the groups read clearly.
+				color.a *= 0.4
 			CellPainter.draw_block(self, rect, color, slot, patterns, _gt)
 	if _lock_t < 1.0:
 		var k := _lock_t
@@ -137,14 +143,21 @@ func _draw() -> void:
 		draw_rect(row_rect, Color(_gt.flash, 0.55 * (1.0 - k)))
 
 
-func _frame_box() -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = _gt.board_background
-	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
-	sb.anti_aliasing = true
-	sb.border_color = _gt.outline
-	sb.set_border_width_all(2)
-	return sb
+func _set_theme(gt: GameTheme) -> void:
+	_gt = gt
+	_frame_box = StyleBoxFlat.new()
+	_frame_box.bg_color = gt.board_background
+	_frame_box.set_corner_radius_all(UiTokens.RADIUS_MD)
+	_frame_box.anti_aliasing = true
+	_frame_box.border_color = gt.outline
+	_frame_box.set_border_width_all(2)
+	_ring_box = StyleBoxFlat.new()
+	_ring_box.draw_center = false
+	_ring_box.border_color = gt.flash
+	_ring_box.set_border_width_all(3)
+	_ring_box.set_corner_radius_all(int(cell_size * CellPainter.RADIUS_RATIO) + 2)
+	_ring_box.anti_aliasing = true
+	queue_redraw()
 
 
 static func _scale_rect(rect: Rect2, s: Vector2) -> Rect2:
@@ -158,10 +171,12 @@ func _animate() -> void:
 	queue_redraw()
 
 
+## The session announces rows (lines_cleared / zen_sweep_started) after the
+## lock's board change and before the board changes again, so any board
+## change here means those rows are gone.
 func _on_board_changed() -> void:
-	if session.state != GameSession.State.LINE_CLEAR:
-		_flash_rows.clear()
-		_sweep_rows = 0
+	_flash_rows.clear()
+	_sweep_rows = 0
 	queue_redraw()
 
 
