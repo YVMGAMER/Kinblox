@@ -1,0 +1,25 @@
+# Godot 4 caches and generated data
+.godot/
+/android/
+android/build/
+
+# Export output
+/build/
+*.apk
+*.aab
+*.ipa
+*.pck
+
+# Signing secrets. export_presets.cfg in this repo has blank signing fields;
+# Godot 4 keeps credentials in .godot/export_credentials.cfg (ignored above).
+*.keystore
+*.jks
+export_credentials.cfg
+
+# Note: *.import files are intentionally committed. In Godot 4 they hold the
+# import settings (e.g. audio loop points) and must be versioned.
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.tmp
