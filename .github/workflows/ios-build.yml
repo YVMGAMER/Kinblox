@@ -1,0 +1,56 @@
+﻿name: Build & Upload iOS
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        run: |
+          curl -LO https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_macos.universal.zip
+          unzip Godot_v4.3-stable_macos.universal.zip
+          curl -LO https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          mkdir -p ~/Library/Application\ Support/Godot/export_templates/4.3.stable
+          unzip Godot_v4.3-stable_export_templates.tpz -d ~/Library/Application\ Support/Godot/export_templates/4.3.stable
+
+      - name: Import signing cert
+        env:
+          CERT_P12: ${{ secrets.CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+        run: |
+          echo "$CERT_P12" | base64 --decode > cert.p12
+          security create-keychain -p actions build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p actions build.keychain
+          security import cert.p12 -k build.keychain -P "$CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions build.keychain
+
+      - name: Install provisioning profile
+        env:
+          PROVISION_PROFILE: ${{ secrets.PROVISION_PROFILE }}
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$PROVISION_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
+
+      - name: Export from Godot
+        run: |
+          ./Godot.app/Contents/MacOS/Godot --headless --export-release "iOS" build/ios/kinblox.xcodeproj
+
+      - name: Archive & export IPA
+        run: |
+          cd build/ios
+          xcodebuild -project kinblox.xcodeproj -scheme kinblox -configuration Release -archivePath kinblox.xcarchive archive
+          xcodebuild -exportArchive -archivePath kinblox.xcarchive -exportPath . -exportOptionsPlist ../../ExportOptions.plist
+
+      - name: Upload to App Store Connect
+        env:
+          ASC_KEY: ${{ secrets.ASC_KEY }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          echo "$ASC_KEY" | base64 --decode > AuthKey.p8
+          mkdir -p ~/.appstoreconnect/private_keys
+          cp AuthKey.p8 ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+          xcrun altool --upload-app --type ios -f build/ios/kinblox.ipa --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
