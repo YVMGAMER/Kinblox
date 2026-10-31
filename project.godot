@@ -10,15 +10,15 @@ config_version=5
 
 [application]
 
-config/name="kinblox/"
+config/name="Kinblox"
 config/description="Kinblox: a falling-block puzzle game with Color Chains."
 config/version="1.0.0"
 run/main_scene="res://scenes/main.tscn"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
 boot_splash/bg_color=Color(0.054902, 0.058824, 0.07451, 1)
 boot_splash/show_image=false
+config/icon="res://icon.svg"
 
 [autoload]
 
@@ -32,7 +32,6 @@ GameState="*res://autoload/game_state.gd"
 [debug]
 
 gdscript/warnings/untyped_declaration=2
-gdscript/warnings/unsafe_call_argument=0
 
 [display]
 
@@ -43,11 +42,6 @@ window/size/window_height_override=960
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
-window/vsync/vsync_mode=1
-
-[gui]
-
-common/snap_controls_to_pixels=true
 
 [input]
 
@@ -113,6 +107,4 @@ pointing/emulate_touch_from_mouse=true
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
-2d/snap/snap_2d_transforms_to_pixel=false
-anti_aliasing/quality/msaa_2d=0
 environment/defaults/default_clear_color=Color(0.054902, 0.058824, 0.07451, 1)
