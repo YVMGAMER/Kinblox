@@ -23,3 +23,9 @@ export_credentials.cfg
 .DS_Store
 Thumbs.db
 *.tmp
+AuthKey_*.p8
+*.mobileprovision
+*.cer
+*.p12
+*.pem
+*_b64.txt
