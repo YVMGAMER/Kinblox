@@ -9,11 +9,14 @@ jobs:
 
       - name: Install Godot
         run: |
-          curl -LO https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_macos.universal.zip
-          unzip Godot_v4.3-stable_macos.universal.zip
-          curl -LO https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
-          mkdir -p ~/Library/Application\ Support/Godot/export_templates/4.3.stable
-          unzip Godot_v4.3-stable_export_templates.tpz -d ~/Library/Application\ Support/Godot/export_templates/4.3.stable
+          V=4.7.2-stable
+          for BASE in https://github.com/godotengine/godot-builds/releases/download https://github.com/godotengine/godot/releases/download; do
+            curl -fLO "$BASE/$V/Godot_v${V}_macos.universal.zip" && curl -fLO "$BASE/$V/Godot_v${V}_export_templates.tpz" && break
+          done
+          unzip -q Godot_v${V}_macos.universal.zip
+          mkdir -p ~/Library/Application\ Support/Godot/export_templates/4.7.2.stable
+          unzip -q Godot_v${V}_export_templates.tpz -d /tmp/tpl
+          cp -R /tmp/tpl/templates/* ~/Library/Application\ Support/Godot/export_templates/4.7.2.stable/
 
       - name: Import signing cert
         env:
@@ -36,12 +39,16 @@ jobs:
 
       - name: Export from Godot
         run: |
+          mkdir -p build/ios
+          ./Godot.app/Contents/MacOS/Godot --headless --import || true
           ./Godot.app/Contents/MacOS/Godot --headless --export-release "iOS" build/ios/kinblox.xcodeproj
+          ls -R build/ios | head -50
 
-      - name: Archive & export IPA
+      - name: Archive and export IPA
         run: |
           cd build/ios
-          xcodebuild -project kinblox.xcodeproj -scheme kinblox -configuration Release -archivePath kinblox.xcarchive archive
+          xcodebuild -list -project kinblox.xcodeproj
+          xcodebuild -project kinblox.xcodeproj -scheme kinblox -configuration Release -archivePath kinblox.xcarchive CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=9U2ANXC444 PROVISIONING_PROFILE_SPECIFIER="decoded_profile" CODE_SIGN_IDENTITY="Apple Distribution" archive
           xcodebuild -exportArchive -archivePath kinblox.xcarchive -exportPath . -exportOptionsPlist ../../ExportOptions.plist
 
       - name: Upload to App Store Connect
@@ -50,7 +57,7 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
-          echo "$ASC_KEY" | base64 --decode > AuthKey.p8
           mkdir -p ~/.appstoreconnect/private_keys
-          cp AuthKey.p8 ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
-          xcrun altool --upload-app --type ios -f build/ios/kinblox.ipa --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          echo "$ASC_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+          IPA=$(ls build/ios/*.ipa | head -1)
+          xcrun altool --upload-app --type ios -f "$IPA" --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
